@@ -5,6 +5,7 @@ namespace Yahtzee.Game.Client
     /// </summary>
     public abstract class GameAction
     {
+        public abstract bool IsValid(Common.Game game);
         public abstract void Perform(Common.Game game);
         public abstract void Revert(Common.Game game);
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Yahtzee.Game.Common.GameCells;
@@ -26,6 +27,16 @@ namespace Yahtzee.Game.Common
 
             return score;
         }
+
+        public int GetScoreInCell(int cellId)
+        {
+            return GameCells[cellId].Score;
+        }
+
+        public bool HasPlayedInCell(int cellId)
+        {
+            return GameCells[cellId].HasPlayed();
+        }
         
         public bool AllCellsPlayed()
         {
@@ -53,6 +64,11 @@ namespace Yahtzee.Game.Common
             }
 
             return hasPlayedAllYahtzee;
+        }
+
+        public Type GetCellType(int id)
+        {
+            return GameCells[id].GetType();
         }
 
         private IEnumerable<GameCell> GetAllCellsOfType<T>() where T : GameCell

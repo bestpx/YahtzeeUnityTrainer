@@ -30,6 +30,8 @@ namespace Yahtzee.Game.Common
         /// </summary>
         private int _deckIndex;
 
+        private bool _hasChangedLockedDiceSinceLastRoll = false;
+
         public Hand()
         {
             var random = new Random();
@@ -139,7 +141,23 @@ namespace Yahtzee.Game.Common
 
             return sum;
         }
-        
+
+        public bool HasRolled()
+        {
+            return _rolls[0] != null;
+        }
+
+        public int GetRollAt(int index)
+        {
+            if (!HasRolled())
+            {
+                return -1;
+            }
+            return _rolls[index].RollValue;
+        }
+
+        public bool HasChangedLockedDiceSinceLastRoll => _hasChangedLockedDiceSinceLastRoll;
+
         #endregion
 
         #region Actions
@@ -170,6 +188,8 @@ namespace Yahtzee.Game.Common
             {
                 _histogram[_rolls[i].RollValue]++;
             }
+
+            _hasChangedLockedDiceSinceLastRoll = false;
         }
 
         public void SetLockStatus(bool[] lockStatus)
@@ -178,6 +198,8 @@ namespace Yahtzee.Game.Common
             {
                 _rolls[i].IsLocked = lockStatus[i];
             }
+
+            _hasChangedLockedDiceSinceLastRoll = true;
         }
 
         #endregion

@@ -10,12 +10,17 @@ namespace Yahtzee.Game.MLAgent
 {
     public class YahtzeePlayerAgent : Agent
     {
+        private YahtzeeAcademy _academy;
+        public float timeBetweenDecisionsAtInference = 0.1f;
+        private float timeSinceDecision;
+        
         private Common.Game _game;
 
         private List<GameAction> _actionTable;
             
         public override void InitializeAgent()
         {
+            _academy = FindObjectOfType<YahtzeeAcademy>();
             _actionTable = new List<GameAction>()
             {
                 new GameActionRoll(),
@@ -25,7 +30,7 @@ namespace Yahtzee.Game.MLAgent
             AddToggleHoldDiceActions();
             
             Debug.Log(_actionTable.Count);
-            Assert.IsTrue(_actionTable.Count == 14 + 31);
+            Assert.IsTrue(_actionTable.Count == 45);
         }
 
         private void AddPlayHandActions()
@@ -36,6 +41,9 @@ namespace Yahtzee.Game.MLAgent
             }
         }
 
+        /// <summary>
+        /// There should be a total of 31 choices
+        /// </summary>
         private void AddToggleHoldDiceActions()
         {
             AddToggleHoldDiceActionsRecur(new bool[5], 0);
@@ -81,19 +89,35 @@ namespace Yahtzee.Game.MLAgent
     
         public override void CollectObservations()
         {
-            // TODO observe gameboard
-            AddVectorObs(gameObject.transform.rotation.z);
-            // TODO observe hand
+            // observe gameboard
+            for (int i = 1; i < 14; i++)
+            {
+                AddVectorObs(_game.GetScoreInCell(i));
+            }
+            // observe hand
+            for (int i = 0; i < 5; i++)
+            {
+                AddVectorObs(_game.GetDiceAt(i));
+            }
         }
     
         public override void AgentAction(float[] vectorAction, string textAction)
         {
             int actionIndex = (int)vectorAction[0];
+//            Debug.Log("actionIndex: " + actionIndex);
             int reward = 0;
             if (brain.brainParameters.vectorActionSpaceType == SpaceType.discrete)
             {
                 int scoreBefore = _game.GetScore();
                 // do actions
+                var gameAction = _actionTable[actionIndex];
+
+                // Is there better ways to enforce game rule?
+                if (!gameAction.IsValid(_game))
+                {
+//                    SetReward(-10);
+                    return;
+                }
                 _actionTable[actionIndex].Perform(_game);
                 
                 // parse action result
@@ -105,14 +129,40 @@ namespace Yahtzee.Game.MLAgent
             SetReward(reward);
             if (_game.IsGameOver()) // gameover
             {
-                Done();
+                EndTraining();
             }
+        }
+
+        private void EndTraining()
+        {
+            Debug.Log("Game finished with score: " + _game.GetScore());
+            Done();
         }
     
         public override void AgentReset()
         {
             Debug.Log("AgentReset");
             _game = ServiceFactory.GetService<GameService>().CreateNewGame();
+        }
+
+        private void Update()
+        {
+            if (!_academy.GetIsInference())
+            {
+                RequestDecision();
+            }
+            else
+            {
+                if (timeSinceDecision >= timeBetweenDecisionsAtInference)
+                {
+                    timeSinceDecision = 0f;
+                    RequestDecision();
+                }
+                else
+                {
+                    timeSinceDecision += Time.deltaTime;
+                }
+            }
         }
     }
 }

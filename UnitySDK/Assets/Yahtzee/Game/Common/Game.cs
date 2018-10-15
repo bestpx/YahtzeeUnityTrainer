@@ -32,6 +32,37 @@ namespace Yahtzee.Game.Common
         {
             return _gameboard.GetScore();
         }
+
+        public int GetScoreInCell(int cellId)
+        {
+            return _gameboard.GetScoreInCell(cellId);
+        }
+
+        public bool CanRoll()
+        {
+            return _hand.CanRoll();
+        }
+
+        public bool CanPlayInCell(int cellId)
+        {
+            return _hand.HasRolled() && !_gameboard.HasPlayedInCell(cellId);
+        }
+
+        public bool CanToggle()
+        {
+            return _hand.HasRolled() && !_hand.HasChangedLockedDiceSinceLastRoll;
+        }
+
+        public int GetDiceAt(int index)
+        {
+            return _hand.GetRollAt(index);
+        }
+
+        public Type GetCellTypeAt(int cellId)
+        {
+            return _gameboard.GetCellType(cellId);
+        }
+        
         #endregion
 
         #region actions
@@ -49,7 +80,6 @@ namespace Yahtzee.Game.Common
 
         public void PlayHand(int cellId)
         {
-            Debug.Log("Playing hand on cellId: " + cellId);
             _gameboard.PlayHand(cellId, _hand);
         }
 

@@ -19,7 +19,12 @@ namespace Yahtzee.Game.Client.GameActions
                 _toggle[i] = toggle[i];
             }
         }
-        
+
+        public override bool IsValid(Common.Game game)
+        {
+            return game.CanToggle();
+        }
+
         public override void Perform(Common.Game game)
         {
             game.ToggleHand(_toggle);
