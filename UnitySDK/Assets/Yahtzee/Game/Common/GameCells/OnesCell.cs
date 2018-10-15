@@ -4,13 +4,7 @@ namespace Yahtzee.Game.Common.GameCells
     {
         public override int EvaluateScore(Hand hand, Gameboard gameboard)
         {
-            int score = hand.GetNumberOfRollsOfValue(1);
-            if (gameboard.ShouldHaveYahtzeeBonus())
-            {
-                score += gameboard.YahtzeeBonus;
-            }
-
-            return score;
+            return EvaluateNumberCategoryCell(gameboard, hand, 1);
         }
     }
 }

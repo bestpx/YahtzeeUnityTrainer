@@ -25,7 +25,9 @@ namespace CommonUtil
                 return (T)service;
             }
 
-            return new T();
+            T newT = new T();
+            Register<T>(newT);
+            return newT;
         }
     }
 }
