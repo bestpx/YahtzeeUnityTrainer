@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using CommonUtil;
 using MLAgents;
+using NUnit.Framework;
 using UnityEngine;
 using Yahtzee.Game.Client;
 using Yahtzee.Game.Client.GameActions;
@@ -18,8 +19,64 @@ namespace Yahtzee.Game.MLAgent
             _actionTable = new List<GameAction>()
             {
                 new GameActionRoll(),
-                new GameActionRoll(),
             };
+            
+            AddPlayHandActions();
+            AddToggleHoldDiceActions();
+            
+            Debug.Log(_actionTable.Count);
+            Assert.IsTrue(_actionTable.Count == 14 + 31);
+        }
+
+        private void AddPlayHandActions()
+        {
+            for (int i = 1; i < 14; i++)
+            {
+                _actionTable.Add(new PlayHandAction(i));
+            }
+        }
+
+        private void AddToggleHoldDiceActions()
+        {
+            AddToggleHoldDiceActionsRecur(new bool[5], 0);
+        }
+
+        private void AddToggleHoldDiceActionsRecur(bool[] array, int index)
+        {
+            bool[] localArray = new bool[5];
+            bool[] localArray2 = new bool[5];
+            for (int i = 0; i < 5; i++)
+            {
+                localArray[i] = array[i];
+                localArray2[i] = array[i];
+            }
+            
+            if (index == localArray.Length)
+            {
+                // don't hold all dice
+                if (AllTrue(array))
+                {
+                    return;
+                }
+                _actionTable.Add(new ToggleHoldDiceAction(localArray));
+                return;
+            }
+
+            localArray[index] = true;
+            localArray2[index] = false;
+            AddToggleHoldDiceActionsRecur(localArray, index + 1);
+            AddToggleHoldDiceActionsRecur(localArray2, index + 1);
+        }
+
+        private bool AllTrue(bool[] array)
+        {
+            bool value = true;
+            for (int i = 0; i < array.Length; i++)
+            {
+                value = value && array[i];
+            }
+
+            return value;
         }
     
         public override void CollectObservations()

@@ -6,14 +6,18 @@ namespace Yahtzee.Game.Client.GameActions
         /// The toggle status of the hand
         /// </summary>
         /// <returns></returns>
-        private bool[] _toggle;
+        private readonly bool[] _toggle;
 
         /// <summary>
         /// Set hand dice lock status to _toggle
         /// </summary>
         public ToggleHoldDiceAction(bool[] toggle)
         {
-            _toggle = toggle;
+            _toggle = new bool[toggle.Length];
+            for (int i = 0; i < toggle.Length; i++)
+            {
+                _toggle[i] = toggle[i];
+            }
         }
         
         public override void Perform(Common.Game game)

@@ -9,6 +9,9 @@ namespace Yahtzee.Game.Common
     /// </summary>
     public abstract class Gameboard
     {
+        /// <summary>
+        /// Id to GameCell map
+        /// </summary>
         protected Dictionary<int, GameCell> GameCells = new Dictionary<int, GameCell>();
         protected Gameboard(){}
 
