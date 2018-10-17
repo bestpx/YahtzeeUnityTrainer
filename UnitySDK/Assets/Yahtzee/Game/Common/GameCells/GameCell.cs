@@ -1,3 +1,5 @@
+using System;
+
 namespace Yahtzee.Game.Common.GameCells
 {
     public abstract class GameCell
@@ -51,6 +53,6 @@ namespace Yahtzee.Game.Common.GameCells
             return gameboard.ShouldHaveYahtzeeBonus() && hand.IsYahtzee() ? gameboard.YahtzeeBonus : 0;
         }
 
-        public int Score => _score;
+        public int Score => Math.Max(_score, 0);
     }
 }

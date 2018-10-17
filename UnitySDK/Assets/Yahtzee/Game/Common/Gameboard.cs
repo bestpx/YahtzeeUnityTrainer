@@ -10,6 +10,8 @@ namespace Yahtzee.Game.Common
     /// </summary>
     public abstract class Gameboard
     {
+        public const int SectionBonus = 35;
+        public const int SectionBonusThreshold = 63;
         /// <summary>
         /// Id to GameCell map
         /// </summary>
@@ -20,9 +22,20 @@ namespace Yahtzee.Game.Common
         public int GetScore()
         {
             int score = 0;
+            int scoreLeftColumn = 0;
             foreach (var gameCell in GameCells)
             {
                 score += gameCell.Value.Score;
+                if (gameCell.Key <= 6)
+                {
+                    scoreLeftColumn += gameCell.Value.Score;
+                }
+            }
+            
+            // section bonus
+            if (scoreLeftColumn >= SectionBonusThreshold)
+            {
+                score += SectionBonus;
             }
 
             return score;
