@@ -149,6 +149,7 @@ namespace Yahtzee.Game.MLAgent
         {
             if (!_academy.GetIsInference())
             {
+//                brain.brainParameters.vectorActionSize[0] = 
                 RequestDecision();
             }
             else

@@ -1,6 +1,9 @@
 using System;
 using System.Text;
+using CommonUtil;
 using UnityEngine;
+using ILogger = CommonUtil.ILogger;
+using Logger = CommonUtil.Logger;
 
 namespace Yahtzee.Game.Common
 {
@@ -85,13 +88,6 @@ namespace Yahtzee.Game.Common
 
         public void ToggleHand(bool[] toggle)
         {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < toggle.Length; i++)
-            {
-                sb.Append(toggle[i]);
-                sb.Append(",");
-            }
-            Debug.Log("ToggleHand: " + sb);
             _hand.SetLockStatus(toggle);
         }
 

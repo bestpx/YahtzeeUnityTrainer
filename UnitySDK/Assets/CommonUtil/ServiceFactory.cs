@@ -17,7 +17,7 @@ namespace CommonUtil
             _map[typeof(T)] = service;
         }
     
-        public static T GetService<T>() where T : new()
+        public static T GetService<T>()
         {
             object service;
             if (_map.TryGetValue(typeof(T), out service))
@@ -25,9 +25,9 @@ namespace CommonUtil
                 return (T)service;
             }
 
-            T newT = new T();
-            Register<T>(newT);
-            return newT;
+            T instance = Activator.CreateInstance<T>();
+            Register<T>(instance);
+            return instance;
         }
     }
 }

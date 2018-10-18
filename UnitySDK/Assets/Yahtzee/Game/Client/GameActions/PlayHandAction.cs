@@ -1,4 +1,7 @@
+using CommonUtil;
 using UnityEngine;
+using ILogger = CommonUtil.ILogger;
+using Logger = CommonUtil.Logger;
 
 namespace Yahtzee.Game.Client.GameActions
 {
@@ -22,7 +25,8 @@ namespace Yahtzee.Game.Client.GameActions
         {
             int score = game.GetScore();
             game.PlayHand(_cellId);
-            Debug.Log("Playing hand on cell: " + game.GetCellTypeAt(_cellId).Name + ", score: " + (game.GetScore() - score));
+            ServiceFactory.GetService<ILogger>().Log(LogLevel.Debug, 
+                "Playing hand on cell: " + game.GetCellTypeAt(_cellId).Name + ", score: " + (game.GetScore() - score));
         }
 
         public override void Revert(Common.Game game)
