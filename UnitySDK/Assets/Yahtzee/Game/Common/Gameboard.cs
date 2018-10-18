@@ -84,6 +84,17 @@ namespace Yahtzee.Game.Common
             return GameCells[id].GetType();
         }
 
+        public int EvaluateHandWithCell(int cellId, Hand hand)
+        {
+            GameCell cell;
+            if (GameCells.TryGetValue(cellId, out cell))
+            {
+                return cell.EvaluateScore(hand, this);
+            }
+
+            return -2;
+        }
+
         private IEnumerable<GameCell> GetAllCellsOfType<T>() where T : GameCell
         {
             return GameCells.Values.Where(cell => cell.GetType() == typeof(T));

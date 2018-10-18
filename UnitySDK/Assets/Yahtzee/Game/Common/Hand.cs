@@ -46,6 +46,24 @@ namespace Yahtzee.Game.Common
                 _rolls[i] = null;
             }
         }
+        
+        /// <summary>
+        /// Use this for test purpose
+        /// </summary>
+        /// <param name="injectedRolls"></param>
+        public Hand(int[] injectedRolls)
+        {
+            _deck = new int[20];
+            for (int i = 0; i < 20; i++)
+            {
+                _deck[i] = injectedRolls[i];
+            }
+
+            for (int i = 0; i < HandSize; i++)
+            {
+                _rolls[i] = null;
+            }
+        }
 
         #region Queries
         
@@ -172,18 +190,18 @@ namespace Yahtzee.Game.Common
             // fill _roll with _deck
             for (int i = 0; i < HandSize; i++)
             {
-                if (_rolls[i] == null)
+                if (_rolls[i] == null || !_rolls[i].IsLocked)
                 {
                     _rolls[i] = new RollSlot(_deck[_deckIndex++], false);
-                }
-                else if (!_rolls[i].IsLocked)
-                {
-                    _rolls[i].RollValue = _deck[_deckIndex++];
                 }
             }
             _rollCount++;
             
             // process current roll
+            for (int i = 0; i < _histogram.Length; i++)
+            {
+                _histogram[i] = 0;
+            }
             for (int i = 0; i < HandSize; i++)
             {
                 _histogram[_rolls[i].RollValue]++;
