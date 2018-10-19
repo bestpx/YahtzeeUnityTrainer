@@ -25,13 +25,18 @@ namespace Yahtzee.Game.Client.GameActions
         {
             int score = game.GetScore();
             game.PlayHand(_cellId);
-            ServiceFactory.GetService<ILogger>().Log(LogLevel.Debug, 
+            Logger.Log(LogLevel.Debug, 
                 "Playing hand on cell: " + game.GetCellTypeAt(_cellId).Name + ", score: " + (game.GetScore() - score));
         }
 
         public override void Revert(Common.Game game)
         {
             throw new System.NotImplementedException();
+        }
+
+        public override int MeanExpectation(Common.Game game)
+        {
+            return game.GetCell(_cellId).MeanExpectation(game.Gameboard);
         }
     }
 }

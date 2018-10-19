@@ -83,6 +83,11 @@ namespace Yahtzee.Game.Common
         {
             return GameCells[id].GetType();
         }
+        
+        public GameCell GetCell(int id)
+        {
+            return GameCells[id];
+        }
 
         public int EvaluateHandWithCell(int cellId, Hand hand)
         {

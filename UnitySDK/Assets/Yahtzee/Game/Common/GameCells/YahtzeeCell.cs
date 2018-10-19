@@ -6,5 +6,10 @@ namespace Yahtzee.Game.Common.GameCells
         {
             return hand.IsYahtzee() ? gameboard.YahtzeeBonus : 0;
         }
+
+        public override int MeanExpectation(Gameboard gameboard)
+        {
+            return 25;
+        }
     }
 }

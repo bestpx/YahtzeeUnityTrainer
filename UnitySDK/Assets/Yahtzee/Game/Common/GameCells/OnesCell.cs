@@ -6,5 +6,10 @@ namespace Yahtzee.Game.Common.GameCells
         {
             return EvaluateNumberCategoryCell(gameboard, hand, 1);
         }
+
+        public override int MeanExpectation(Gameboard gameboard)
+        {
+            return 3;
+        }
     }
 }

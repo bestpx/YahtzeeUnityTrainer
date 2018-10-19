@@ -13,5 +13,10 @@ namespace Yahtzee.Game.Common.GameCells
             value += YahtzeeBonus(gameboard, hand);
             return value;
         }
+
+        public override int MeanExpectation(Gameboard gameboard)
+        {
+            return 20;
+        }
     }
 }

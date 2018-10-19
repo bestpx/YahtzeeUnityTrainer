@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CommonUtil;
 using MLAgents;
@@ -5,11 +6,13 @@ using NUnit.Framework;
 using UnityEngine;
 using Yahtzee.Game.Client;
 using Yahtzee.Game.Client.GameActions;
+using ILogger = CommonUtil.ILogger;
 
 namespace Yahtzee.Game.MLAgent
 {
     public class YahtzeePlayerAgent : Agent
     {
+        public event Action<GameOverEvent> GameOverEvent = delegate {  };
         private YahtzeeAcademy _academy;
         public float timeBetweenDecisionsAtInference = 0.1f;
         private float timeSinceDecision;
@@ -17,10 +20,20 @@ namespace Yahtzee.Game.MLAgent
         private Common.Game _game;
 
         private List<GameAction> _actionTable;
+
+        private ILogger Logger
+        {
+            get { return ServiceFactory.GetService<ILogger>(); }
+        }
             
         public override void InitializeAgent()
         {
+            Logger.Log(LogLevel.Info, "Initialize Agent");
+            _game = ServiceFactory.GetService<GameService>().CreateNewGame();
             _academy = FindObjectOfType<YahtzeeAcademy>();
+            var gamesManager = FindObjectOfType<GamesManager>();
+            gamesManager.AddAgent(this);
+            
             _actionTable = new List<GameAction>()
             {
                 new GameActionRoll(),
@@ -28,9 +41,6 @@ namespace Yahtzee.Game.MLAgent
             
             AddPlayHandActions();
             AddToggleHoldDiceActions();
-            
-            Debug.Log(_actionTable.Count);
-            Assert.IsTrue(_actionTable.Count == 45);
         }
 
         private void AddPlayHandActions()
@@ -94,39 +104,67 @@ namespace Yahtzee.Game.MLAgent
             {
                 AddVectorObs(_game.GetScoreInCell(i));
             }
+           
             // observe hand
             for (int i = 0; i < 5; i++)
             {
                 AddVectorObs(_game.GetDiceAt(i));
+            }
+            for (int i = 0; i < _game.Hand.Deck.Length; i++)
+            {
+                AddVectorObs(_game.Hand.Deck[i]);
+            }
+            // observe gameboard cells, this affects the available decisions
+            for (int i = 1; i < 14; i++)
+            {
+                AddVectorObs(_game.CanPlayInCell(i));
+            }
+            AddVectorObs(_game.CanRoll());
+            AddVectorObs(_game.CanToggle());
+            AddVectorObs(_game.Hand.RollCount);
+            
+            // mask actions
+            List<int> mask = new List<int>();
+            for (int i = 0; i < _actionTable.Count; i++)
+            {
+                if (!_actionTable[i].IsValid(_game))
+                {
+                   mask.Add(i);
+                }
+            }
+
+            if (mask.Count != _actionTable.Count)
+            {
+                SetActionMask(0, mask);
             }
         }
     
         public override void AgentAction(float[] vectorAction, string textAction)
         {
             int actionIndex = (int)vectorAction[0];
-//            Debug.Log("actionIndex: " + actionIndex);
-            int reward = 0;
+            int scoreCurrentTurn = 0;
+            var gameAction = _actionTable[actionIndex];
+            int expectation = gameAction.MeanExpectation(_game);
             if (brain.brainParameters.vectorActionSpaceType == SpaceType.discrete)
             {
                 int scoreBefore = _game.GetScore();
                 // do actions
-                var gameAction = _actionTable[actionIndex];
 
                 // Is there better ways to enforce game rule?
                 if (!gameAction.IsValid(_game))
                 {
-//                    SetReward(-10);
                     return;
                 }
                 _actionTable[actionIndex].Perform(_game);
                 
                 // parse action result
                 int scoreAfter = _game.GetScore();
-                reward = scoreAfter - scoreBefore;
+                scoreCurrentTurn = scoreAfter - scoreBefore;
             }
             
             // Reward agent
-            SetReward(reward);
+            SetReward(scoreCurrentTurn - expectation);
+            
             if (_game.IsGameOver()) // gameover
             {
                 EndTraining();
@@ -135,13 +173,14 @@ namespace Yahtzee.Game.MLAgent
 
         private void EndTraining()
         {
-            Debug.Log("Game finished with score: " + _game.GetScore());
+            GameOverEvent(new GameOverEvent(_game));
+            Logger.Log(LogLevel.Debug, "Game finished with score: " + _game.GetScore());
             Done();
         }
     
         public override void AgentReset()
         {
-            Debug.Log("AgentReset");
+            Logger.Log(LogLevel.Debug, "AgentReset");
             _game = ServiceFactory.GetService<GameService>().CreateNewGame();
         }
 
@@ -149,7 +188,6 @@ namespace Yahtzee.Game.MLAgent
         {
             if (!_academy.GetIsInference())
             {
-//                brain.brainParameters.vectorActionSize[0] = 
                 RequestDecision();
             }
             else
@@ -157,6 +195,7 @@ namespace Yahtzee.Game.MLAgent
                 if (timeSinceDecision >= timeBetweenDecisionsAtInference)
                 {
                     timeSinceDecision = 0f;
+                    brain.brainParameters.vectorActionSize[0] = _actionTable.Count;
                     RequestDecision();
                 }
                 else

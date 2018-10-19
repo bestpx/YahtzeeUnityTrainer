@@ -1,3 +1,5 @@
+using CommonUtil;
+
 namespace Yahtzee.Game.Client.GameActions
 {
     public class GameActionRoll : GameAction
@@ -9,6 +11,7 @@ namespace Yahtzee.Game.Client.GameActions
 
         public override void Perform(Common.Game game)
         {
+            Logger.Log(LogLevel.Debug, "GameActionRoll");
             game.Roll();
         }
 

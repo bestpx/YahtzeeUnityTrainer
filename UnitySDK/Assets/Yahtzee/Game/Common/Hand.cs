@@ -174,7 +174,14 @@ namespace Yahtzee.Game.Common
             return _rolls[index].RollValue;
         }
 
+        public bool IsLastRoll()
+        {
+            return _rollCount == MaxRollCount;
+        }
+
         public bool HasChangedLockedDiceSinceLastRoll => _hasChangedLockedDiceSinceLastRoll;
+        public int RollCount => _rollCount;
+        public int[] Deck => _deck;
 
         #endregion
 

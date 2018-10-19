@@ -1,3 +1,5 @@
+using CommonUtil;
+
 namespace Yahtzee.Game.Client
 {
     /// <summary>
@@ -5,8 +7,17 @@ namespace Yahtzee.Game.Client
     /// </summary>
     public abstract class GameAction
     {
+        protected ILogger Logger
+        {
+            get { return ServiceFactory.GetService<ILogger>(); }
+        }
         public abstract bool IsValid(Common.Game game);
         public abstract void Perform(Common.Game game);
         public abstract void Revert(Common.Game game);
+
+        public virtual int MeanExpectation(Common.Game game)
+        {
+            return 0;
+        }
     }
 }

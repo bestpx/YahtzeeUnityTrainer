@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using CommonUtil;
 using UnityEngine;
+using Yahtzee.Game.Common.GameCells;
 using ILogger = CommonUtil.ILogger;
 using Logger = CommonUtil.Logger;
 
@@ -53,7 +54,7 @@ namespace Yahtzee.Game.Common
 
         public bool CanToggle()
         {
-            return _hand.HasRolled() && !_hand.HasChangedLockedDiceSinceLastRoll;
+            return _hand.HasRolled() && !_hand.HasChangedLockedDiceSinceLastRoll && !_hand.IsLastRoll();
         }
 
         public int GetDiceAt(int index)
@@ -66,6 +67,15 @@ namespace Yahtzee.Game.Common
             return _gameboard.GetCellType(cellId);
         }
         
+        public GameCell GetCell(int cellId)
+        {
+            return _gameboard.GetCell(cellId);
+        }
+
+        public Gameboard Gameboard => _gameboard;
+
+        public Hand Hand => _hand;
+
         #endregion
 
         #region actions
@@ -84,6 +94,7 @@ namespace Yahtzee.Game.Common
         public void PlayHand(int cellId)
         {
             _gameboard.PlayHand(cellId, _hand);
+            _hand = new Hand();
         }
 
         public void ToggleHand(bool[] toggle)

@@ -1,3 +1,6 @@
+using System.Text;
+using CommonUtil;
+
 namespace Yahtzee.Game.Client.GameActions
 {
     public class ToggleHoldDiceAction : GameAction
@@ -27,12 +30,24 @@ namespace Yahtzee.Game.Client.GameActions
 
         public override void Perform(Common.Game game)
         {
+            Logger.Log(LogLevel.Debug, "Toggle: " + GetToggleString());
             game.ToggleHand(_toggle);
         }
 
         public override void Revert(Common.Game game)
         {
             throw new System.NotImplementedException();
+        }
+
+        private StringBuilder GetToggleString()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < _toggle.Length; i++)
+            {
+                sb.Append(_toggle[i] + ", ");
+            }
+
+            return sb;
         }
     }
 }
