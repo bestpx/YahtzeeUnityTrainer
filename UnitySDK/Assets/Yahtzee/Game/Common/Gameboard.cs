@@ -73,7 +73,7 @@ namespace Yahtzee.Game.Common
             var yahtzeeCells = GetAllCellsOfType<YahtzeeCell>();
             foreach (var yahtzeeCell in yahtzeeCells)
             {
-                hasPlayedAllYahtzee = hasPlayedAllYahtzee && yahtzeeCell.HasPlayed();
+                hasPlayedAllYahtzee = hasPlayedAllYahtzee && yahtzeeCell.Score > 0;
             }
 
             return hasPlayedAllYahtzee;

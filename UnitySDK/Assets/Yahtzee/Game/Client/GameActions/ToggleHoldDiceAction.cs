@@ -30,7 +30,7 @@ namespace Yahtzee.Game.Client.GameActions
 
         public override void Perform(Common.Game game)
         {
-            Logger.Log(LogLevel.Debug, "Toggle: " + GetToggleString());
+            Logger.Log(LogLevel.Debug, "hand: " + game.Hand.ToString() + "Toggle: " + GetToggleString());
             game.ToggleHand(_toggle);
         }
 

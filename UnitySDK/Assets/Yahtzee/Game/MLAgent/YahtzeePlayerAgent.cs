@@ -115,10 +115,6 @@ namespace Yahtzee.Game.MLAgent
             {
                 AddVectorObs(_game.Hand.IsLockedAt(i));  // 5
             }
-//            for (int i = 0; i < _game.Hand.Deck.Length; i++)
-//            {
-//                AddVectorObs(_game.Hand.Deck[i]);
-//            }
             // observe gameboard cells, this affects the available decisions
             for (int i = 1; i < 14; i++)
             {

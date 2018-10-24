@@ -17,7 +17,6 @@ namespace Yahtzee.Game.Client
         private int _gamesWithYahtzee = 0;
 
         private LinkedList<int> _scoreLast100 = new LinkedList<int>();
-        private int _gameCount100 = 0;
         
         private ILogger Logger
         {
@@ -42,12 +41,12 @@ namespace Yahtzee.Game.Client
                 _gamesWithYahtzee++;
             }
 
-            float averageLast100 = 0;
+            double averageLast100 = 0;
             _scoreLast100.AddLast(new LinkedListNode<int>(evt.Game.GetScore()));
             if (_scoreLast100.Count > 100)
             {
                 _scoreLast100.RemoveFirst();
-                _scoreLast100.Average();
+                averageLast100 = _scoreLast100.Average();
             }
             
             Logger.Log(LogLevel.Info, "GameOver with score: " + score + "\n Average score for last 100 games: " + averageLast100 + "\n High score: " + _highScore);
