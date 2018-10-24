@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using CommonUtil;
 using UnityEngine;
 using UnityEngine.Analytics;
@@ -11,6 +13,11 @@ namespace Yahtzee.Game.Client
     {
         private int _gameCount = 0;
         private float _averageScore = 0;
+        private int _highScore = 0;
+        private int _gamesWithYahtzee = 0;
+
+        private LinkedList<int> _scoreLast100 = new LinkedList<int>();
+        private int _gameCount100 = 0;
         
         private ILogger Logger
         {
@@ -28,9 +35,23 @@ namespace Yahtzee.Game.Client
             int gameCountNext = _gameCount + 1;
             _averageScore = (_averageScore * _gameCount / gameCountNext) + (score / gameCountNext);
             _gameCount = gameCountNext;
+            _highScore = Mathf.Max(evt.Game.GetScore(), _highScore);
+
+            if (evt.Game.Gameboard.ShouldHaveYahtzeeBonus())
+            {
+                _gamesWithYahtzee++;
+            }
+
+            float averageLast100 = 0;
+            _scoreLast100.AddLast(new LinkedListNode<int>(evt.Game.GetScore()));
+            if (_scoreLast100.Count > 100)
+            {
+                _scoreLast100.RemoveFirst();
+                _scoreLast100.Average();
+            }
             
-            Logger.Log(LogLevel.Info, "GameOver with score: " + score + "\n Current Average: " + _averageScore);
-            Logger.Log(LogLevel.Info, "_gameCount: " + _gameCount);
+            Logger.Log(LogLevel.Info, "GameOver with score: " + score + "\n Average score for last 100 games: " + averageLast100 + "\n High score: " + _highScore);
+            Logger.Log(LogLevel.Info, "_gameCount: " + _gameCount + ", games with yahtzee: " + _gamesWithYahtzee);
         }
     }
 }

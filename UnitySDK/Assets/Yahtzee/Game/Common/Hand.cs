@@ -173,6 +173,15 @@ namespace Yahtzee.Game.Common
             }
             return _rolls[index].RollValue;
         }
+        
+        public bool IsLockedAt(int index)
+        {
+            if (!HasRolled())
+            {
+                return false;
+            }
+            return _rolls[index].IsLocked;
+        }
 
         public bool IsLastRoll()
         {

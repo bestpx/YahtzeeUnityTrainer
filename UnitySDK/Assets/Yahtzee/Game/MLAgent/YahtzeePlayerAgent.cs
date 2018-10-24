@@ -111,6 +111,10 @@ namespace Yahtzee.Game.MLAgent
             {
                 AddVectorObs(_game.GetDiceAt(i), 7);  // 7 * 5 = 35
             }
+            for (int i = 0; i < 5; i++)
+            {
+                AddVectorObs(_game.Hand.IsLockedAt(i));  // 5
+            }
 //            for (int i = 0; i < _game.Hand.Deck.Length; i++)
 //            {
 //                AddVectorObs(_game.Hand.Deck[i]);
