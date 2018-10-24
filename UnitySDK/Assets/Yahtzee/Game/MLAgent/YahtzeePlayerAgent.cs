@@ -100,28 +100,32 @@ namespace Yahtzee.Game.MLAgent
         public override void CollectObservations()
         {
             // observe gameboard
+            float maxPossible = _game.Gameboard.ShouldHaveYahtzeeBonus() ? 80 : 50;
             for (int i = 1; i < 14; i++)
             {
-                AddVectorObs(_game.GetScoreInCell(i));
+                AddVectorObs(_game.GetScoreInCell(i) / maxPossible); // 13
             }
            
             // observe hand
             for (int i = 0; i < 5; i++)
             {
-                AddVectorObs(_game.GetDiceAt(i));
+                AddVectorObs(_game.GetDiceAt(i), 7);  // 7 * 5 = 35
             }
-            for (int i = 0; i < _game.Hand.Deck.Length; i++)
-            {
-                AddVectorObs(_game.Hand.Deck[i]);
-            }
+//            for (int i = 0; i < _game.Hand.Deck.Length; i++)
+//            {
+//                AddVectorObs(_game.Hand.Deck[i]);
+//            }
             // observe gameboard cells, this affects the available decisions
             for (int i = 1; i < 14; i++)
             {
-                AddVectorObs(_game.CanPlayInCell(i));
+                AddVectorObs(_game.CanPlayInCell(i)); // 13
             }
             AddVectorObs(_game.CanRoll());
             AddVectorObs(_game.CanToggle());
             AddVectorObs(_game.Hand.RollCount);
+            AddVectorObs(_game.Gameboard.ShouldHaveYahtzeeBonus()); // 4
+            
+            // TODO observe section bonus info
             
             // mask actions
             List<int> mask = new List<int>();
@@ -144,7 +148,6 @@ namespace Yahtzee.Game.MLAgent
             int actionIndex = (int)vectorAction[0];
             int scoreCurrentTurn = 0;
             var gameAction = _actionTable[actionIndex];
-            int expectation = gameAction.MeanExpectation(_game);
             if (brain.brainParameters.vectorActionSpaceType == SpaceType.discrete)
             {
                 int scoreBefore = _game.GetScore();
@@ -163,7 +166,9 @@ namespace Yahtzee.Game.MLAgent
             }
             
             // Reward agent
-            SetReward(scoreCurrentTurn - expectation);
+            float highestPossible = _game.Gameboard.ShouldHaveYahtzeeBonus() ? 80.0f : 50.0f;
+            float normalizedReward = scoreCurrentTurn / highestPossible;
+            SetReward(normalizedReward);
             
             if (_game.IsGameOver()) // gameover
             {

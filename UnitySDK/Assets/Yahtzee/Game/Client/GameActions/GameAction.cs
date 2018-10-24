@@ -19,5 +19,10 @@ namespace Yahtzee.Game.Client
         {
             return 0;
         }
+
+        public virtual int MaximumPossible(Common.Game game)
+        {
+            return 0;
+        }
     }
 }

@@ -11,5 +11,10 @@ namespace Yahtzee.Game.Common.GameCells
         {
             return 25;
         }
+
+        public override int MaximumPossible(Gameboard gameboard)
+        {
+            return 50;
+        }
     }
 }

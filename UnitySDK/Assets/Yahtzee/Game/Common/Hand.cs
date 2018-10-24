@@ -169,7 +169,7 @@ namespace Yahtzee.Game.Common
         {
             if (!HasRolled())
             {
-                return -1;
+                return 0;
             }
             return _rolls[index].RollValue;
         }

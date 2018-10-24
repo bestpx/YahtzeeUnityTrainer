@@ -38,5 +38,10 @@ namespace Yahtzee.Game.Client.GameActions
         {
             return game.GetCell(_cellId).MeanExpectation(game.Gameboard);
         }
+
+        public override int MaximumPossible(Common.Game game)
+        {
+            return game.GetCell(_cellId).MaximumPossible(game.Gameboard);
+        }
     }
 }
