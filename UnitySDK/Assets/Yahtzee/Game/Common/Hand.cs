@@ -192,14 +192,18 @@ namespace Yahtzee.Game.Common
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < _rolls.Length; i++)
+            if (_rolls != null && HasRolled())
             {
-                if (_rolls[i].IsLocked)
+                for (int i = 0; i < _rolls.Length; i++)
                 {
-                    sb.Append("*");
+                    if (_rolls[i].IsLocked)
+                    {
+                        sb.Append("*");
+                    }
+
+                    sb.Append(_rolls[i].RollValue);
+                    sb.Append(",");
                 }
-                sb.Append(_rolls[i].RollValue);
-                sb.Append(",");
             }
 
             return sb.ToString();
