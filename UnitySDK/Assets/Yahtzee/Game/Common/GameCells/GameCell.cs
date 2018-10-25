@@ -11,6 +11,8 @@ namespace Yahtzee.Game.Common.GameCells
         /// score in the gamecell, -1 for not played
         /// </summary>
         private int _score = -1;
+
+        private bool _hasYahtzeeBonus;
         
         /// <summary>
         /// Evaluate score by hand and gameboard status
@@ -24,6 +26,7 @@ namespace Yahtzee.Game.Common.GameCells
         public void PlayHand(Hand hand, Gameboard gameboard)
         {
             _score = EvaluateScore(hand, gameboard);
+            _hasYahtzeeBonus = gameboard.ShouldHaveYahtzeeBonus() && hand.IsYahtzee();
         }
 
         public bool HasPlayed()
@@ -57,5 +60,15 @@ namespace Yahtzee.Game.Common.GameCells
         }
 
         public int Score => Math.Max(_score, 0);
+
+        public int ScoreWithoutYahtzeeBonus(Gameboard gameboard)
+        {
+            if (_hasYahtzeeBonus)
+            {
+                return Score - gameboard.YahtzeeBonus;
+            }
+
+            return Score;
+        }
     }
 }
