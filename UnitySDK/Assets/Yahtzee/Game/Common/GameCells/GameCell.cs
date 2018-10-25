@@ -19,6 +19,7 @@ namespace Yahtzee.Game.Common.GameCells
         public abstract int EvaluateScore(Hand hand, Gameboard gameboard);
 
         public abstract int MeanExpectation(Gameboard gameboard);
+        public abstract int MaximumPossible(Gameboard gameboard);
 
         public void PlayHand(Hand hand, Gameboard gameboard)
         {

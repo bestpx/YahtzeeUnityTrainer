@@ -11,8 +11,8 @@ namespace Yahtzee.Game.Client.GameActions
 
         public override void Perform(Common.Game game)
         {
-            Logger.Log(LogLevel.Debug, "GameActionRoll");
             game.Roll();
+            Logger.Log(LogLevel.Debug, "GameActionRoll, current hand: " + game.Hand.ToString());
         }
 
         public override void Revert(Common.Game game)

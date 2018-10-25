@@ -24,9 +24,10 @@ namespace Yahtzee.Game.Client.GameActions
         public override void Perform(Common.Game game)
         {
             int score = game.GetScore();
+            string handStr = game.Hand.ToString();
             game.PlayHand(_cellId);
             Logger.Log(LogLevel.Debug, 
-                "Playing hand on cell: " + game.GetCellTypeAt(_cellId).Name + ", score: " + (game.GetScore() - score));
+                "Playing hand: " + handStr + " on cell: " + game.GetCellTypeAt(_cellId).Name + ", score: " + (game.GetScore() - score));
         }
 
         public override void Revert(Common.Game game)
@@ -37,6 +38,11 @@ namespace Yahtzee.Game.Client.GameActions
         public override int MeanExpectation(Common.Game game)
         {
             return game.GetCell(_cellId).MeanExpectation(game.Gameboard);
+        }
+
+        public override int MaximumPossible(Common.Game game)
+        {
+            return game.GetCell(_cellId).MaximumPossible(game.Gameboard);
         }
     }
 }

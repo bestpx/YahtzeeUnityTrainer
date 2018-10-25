@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using Random = System.Random;
 
@@ -169,14 +170,43 @@ namespace Yahtzee.Game.Common
         {
             if (!HasRolled())
             {
-                return -1;
+                return 0;
             }
             return _rolls[index].RollValue;
+        }
+        
+        public bool IsLockedAt(int index)
+        {
+            if (!HasRolled())
+            {
+                return false;
+            }
+            return _rolls[index].IsLocked;
         }
 
         public bool IsLastRoll()
         {
             return _rollCount == MaxRollCount;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            if (_rolls != null && HasRolled())
+            {
+                for (int i = 0; i < _rolls.Length; i++)
+                {
+                    if (_rolls[i].IsLocked)
+                    {
+                        sb.Append("*");
+                    }
+
+                    sb.Append(_rolls[i].RollValue);
+                    sb.Append(",");
+                }
+            }
+
+            return sb.ToString();
         }
 
         public bool HasChangedLockedDiceSinceLastRoll => _hasChangedLockedDiceSinceLastRoll;
