@@ -129,7 +129,7 @@ namespace Yahtzee.Game.MLAgent
             // TODO observe section bonus info
             
             // mask actions
-            List<int> mask = new List<int>();
+            mask = new List<int>();
             for (int i = 0; i < _actionTable.Count; i++)
             {
                 if (!_actionTable[i].IsValid(_game))
@@ -138,11 +138,10 @@ namespace Yahtzee.Game.MLAgent
                 }
             }
 
-            if (mask.Count != _actionTable.Count)
-            {
-                SetActionMask(0, mask);
-            }
+            SetActionMask(0, mask);
         }
+        
+        private List<int> mask;
     
         public override void AgentAction(float[] vectorAction, string textAction)
         {
@@ -196,8 +195,13 @@ namespace Yahtzee.Game.MLAgent
             Logger.Log(LogLevel.Debug, "AgentReset");
             _game = ServiceFactory.GetService<GameService>().CreateNewGame();
         }
+        
+        public void FixedUpdate()
+        {
+            WaitTimeInference();
+        }
 
-        private void Update()
+        private void WaitTimeInference()
         {
             if (!_academy.GetIsInference())
             {
@@ -208,12 +212,11 @@ namespace Yahtzee.Game.MLAgent
                 if (timeSinceDecision >= timeBetweenDecisionsAtInference)
                 {
                     timeSinceDecision = 0f;
-                    brain.brainParameters.vectorActionSize[0] = _actionTable.Count;
                     RequestDecision();
                 }
                 else
                 {
-                    timeSinceDecision += Time.deltaTime;
+                    timeSinceDecision += Time.fixedDeltaTime;
                 }
             }
         }
