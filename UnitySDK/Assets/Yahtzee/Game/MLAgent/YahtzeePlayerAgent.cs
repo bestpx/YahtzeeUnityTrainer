@@ -6,6 +6,7 @@ using NUnit.Framework;
 using UnityEngine;
 using Yahtzee.Game.Client;
 using Yahtzee.Game.Client.GameActions;
+using Yahtzee.Game.Common;
 using ILogger = CommonUtil.ILogger;
 
 namespace Yahtzee.Game.MLAgent
@@ -146,27 +147,34 @@ namespace Yahtzee.Game.MLAgent
         {
             int actionIndex = Mathf.FloorToInt(vectorAction[0]);
             int scoreCurrentTurn = 0;
+            int scoreGainedInLeftColumnWithoutYahtzeeBonus = 0;
             var gameAction = _actionTable[actionIndex];
             if (brain.brainParameters.vectorActionSpaceType == SpaceType.discrete)
             {
-                int scoreBefore = _game.GetScore();
+                int scoreBefore = _game.Gameboard.GetScoreWithoutSectionBonus();
+                int leftColumnScoreBefore = _game.Gameboard.GetLeftColumnScoreWithoutYahtzeeBonus();
                 // do actions
 
-                // Is there better ways to enforce game rule?
+                // ignore invalid actions
                 if (!gameAction.IsValid(_game))
                 {
+                    Logger.Log(LogLevel.Error, "Invalid Game action attempted! " + gameAction.GetType());
                     return;
                 }
                 _actionTable[actionIndex].Perform(_game);
                 
                 // parse action result
-                int scoreAfter = _game.GetScore();
+                int scoreAfter = _game.Gameboard.GetScoreWithoutSectionBonus();
+                int scoreLeftColumnAfter = _game.Gameboard.GetLeftColumnScoreWithoutYahtzeeBonus();
                 scoreCurrentTurn = scoreAfter - scoreBefore;
+                scoreGainedInLeftColumnWithoutYahtzeeBonus = scoreLeftColumnAfter - leftColumnScoreBefore;
             }
             
             // Reward agent
             float highestPossible = _game.Gameboard.ShouldHaveYahtzeeBonus() ? 80.0f : 50.0f;
-            float normalizedReward = scoreCurrentTurn / highestPossible;
+            float sectionBonusPercentage = (float) scoreGainedInLeftColumnWithoutYahtzeeBonus / Gameboard.SectionBonusThreshold *
+                Gameboard.SectionBonus;
+            float normalizedReward = (scoreCurrentTurn + sectionBonusPercentage) / highestPossible;
             SetReward(normalizedReward);
             
             if (_game.IsGameOver()) // gameover
@@ -187,8 +195,13 @@ namespace Yahtzee.Game.MLAgent
             Logger.Log(LogLevel.Debug, "AgentReset");
             _game = ServiceFactory.GetService<GameService>().CreateNewGame();
         }
+        
+        public void FixedUpdate()
+        {
+            WaitTimeInference();
+        }
 
-        private void Update()
+        private void WaitTimeInference()
         {
             if (!_academy.GetIsInference())
             {
@@ -199,12 +212,11 @@ namespace Yahtzee.Game.MLAgent
                 if (timeSinceDecision >= timeBetweenDecisionsAtInference)
                 {
                     timeSinceDecision = 0f;
-                    brain.brainParameters.vectorActionSize[0] = _actionTable.Count;
                     RequestDecision();
                 }
                 else
                 {
-                    timeSinceDecision += Time.deltaTime;
+                    timeSinceDecision += Time.fixedDeltaTime;
                 }
             }
         }
