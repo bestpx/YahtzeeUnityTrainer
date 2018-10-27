@@ -128,24 +128,23 @@ namespace Yahtzee.Game.MLAgent
             // TODO observe section bonus info
             
             // mask actions
-            List<int> mask = new List<int>();
+            _mask = new List<int>();
             for (int i = 0; i < _actionTable.Count; i++)
             {
                 if (!_actionTable[i].IsValid(_game))
                 {
-                   mask.Add(i);
+                   _mask.Add(i);
                 }
             }
 
-            if (mask.Count != _actionTable.Count)
-            {
-                SetActionMask(0, mask);
-            }
+            SetActionMask(0, _mask);
         }
+        
+        private List<int> _mask;
     
         public override void AgentAction(float[] vectorAction, string textAction)
         {
-            int actionIndex = (int)vectorAction[0];
+            int actionIndex = Mathf.FloorToInt(vectorAction[0]);
             int scoreCurrentTurn = 0;
             var gameAction = _actionTable[actionIndex];
             if (brain.brainParameters.vectorActionSpaceType == SpaceType.discrete)
