@@ -17,28 +17,59 @@ namespace Yahtzee.Game.Common
         /// </summary>
         protected Dictionary<int, GameCell> GameCells = new Dictionary<int, GameCell>();
         protected Gameboard(){}
-
+        
         #region queries
         public int GetScore()
         {
-            int score = 0;
-            int scoreLeftColumn = 0;
-            foreach (var gameCell in GameCells)
-            {
-                score += gameCell.Value.Score;
-                if (gameCell.Key <= 6)
-                {
-                    scoreLeftColumn += gameCell.Value.Score;
-                }
-            }
+            int score = GetScoreWithoutSectionBonus();
             
             // section bonus
-            if (scoreLeftColumn >= SectionBonusThreshold)
+            if (GetLeftColumnScoreWithoutYahtzeeBonus() >= SectionBonusThreshold)
             {
                 score += SectionBonus;
             }
 
             return score;
+        }
+
+        public int GetScoreWithoutSectionBonus()
+        {
+            int score = 0;
+            foreach (var gameCell in GameCells)
+            {
+                score += gameCell.Value.Score;
+            }
+            
+            return score;
+        }
+        
+        /// <summary>
+        /// Get score without yahtzee bonus and section bonus
+        /// </summary>
+        /// <returns>Score without yahtzee bonus and section bonus</returns>
+        public int GetRawScore()
+        {
+            int score = 0;
+            foreach (var gameCell in GameCells)
+            {
+                score += gameCell.Value.ScoreWithoutYahtzeeBonus(this);
+            }
+
+            return score;
+        }
+
+        public int GetLeftColumnScoreWithoutYahtzeeBonus()
+        {
+            int scoreLeftColumn = 0;
+            foreach (var gameCell in GameCells)
+            {
+                if (gameCell.Key <= 6)
+                {
+                    scoreLeftColumn += gameCell.Value.ScoreWithoutYahtzeeBonus(this);
+                }
+            }
+
+            return scoreLeftColumn;
         }
 
         public int GetScoreInCell(int cellId)
