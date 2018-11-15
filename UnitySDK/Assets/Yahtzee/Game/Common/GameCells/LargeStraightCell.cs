@@ -7,7 +7,7 @@ namespace Yahtzee.Game.Common.GameCells
         {
             int value = 0;
 
-            if (hand.GetMaxStreak() >= 3)
+            if (hand.GetMaxStreak() >= 5)
             {
                 value += LargeStraightValue;
             }

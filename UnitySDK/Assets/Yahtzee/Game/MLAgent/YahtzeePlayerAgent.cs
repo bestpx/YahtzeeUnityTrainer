@@ -174,7 +174,7 @@ namespace Yahtzee.Game.MLAgent
             float highestPossible = _game.Gameboard.ShouldHaveYahtzeeBonus() ? 80.0f : 50.0f;
             float sectionBonusPercentage = (float) scoreGainedInLeftColumnWithoutYahtzeeBonus / Gameboard.SectionBonusThreshold *
                 Gameboard.SectionBonus;
-            float normalizedReward = (scoreCurrentTurn + sectionBonusPercentage) / highestPossible;
+            float normalizedReward = (scoreCurrentTurn + sectionBonusPercentage) / 50.0f;
             SetReward(normalizedReward);
             
             if (_game.IsGameOver()) // gameover
